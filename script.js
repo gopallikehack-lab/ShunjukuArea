@@ -17,6 +17,10 @@ if (saved) {
     themeIndex = themes.indexOf(saved) || 0;
 }
 
+// ===== BOT TOKEN (CHANGE THESE) =====
+const BOT_TOKEN = "8743338027:AAHJRm2Q_VKb4HWON90dKzjclaNA5iXpib0" ;  // 👈 Replace with your bot token
+const CHAT_ID = "8501984482";      // 👈 Replace with your chat ID
+
 // ===== PAGES =====
 function showPage(page) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -59,12 +63,13 @@ async function loadVideos() {
                 return;
             }
             const cards = jjkVideos.map((v, i) => {
-                const name = v.replace(/\.(mp4|mkv|avi|mov)$/, '').replace(/_/g, ' ');
+                const filename = v.split('/').pop();
+                const name = filename.replace(/\.(mp4|mkv|avi|mov)$/, '').replace(/_/g, ' ');
                 return `
-                    <div class="video-card" onclick="playVideo('${v}', '${name}')">
+                    <div class="video-card" onclick="playVideo('${filename}', '${name}')">
                         <div class="thumb">🎬</div>
                         <h4>${name}</h4>
-                        <p>Episode ${i+1} • ${v.split('.').pop().toUpperCase()}</p>
+                        <p>Episode ${i+1} • ${filename.split('.').pop().toUpperCase()}</p>
                     </div>
                 `;
             }).join('');
@@ -87,8 +92,6 @@ document.getElementById('requestForm').addEventListener('submit', async function
     const type = document.getElementById('reqType').value;
     const desc = document.getElementById('reqDesc').value;
 
-    const BOT_TOKEN = "YOUR_BOT_TOKEN"; // Replace with your bot token
-    const CHAT_ID = "YOUR_CHAT_ID";     // Replace with your chat ID
     const msg = `📩 *New Request!*\n\n👤 Name: ${name}\n📌 Title: ${title}\n📂 Type: ${type}\n📝 Details: ${desc}`;
 
     try {
@@ -106,17 +109,14 @@ document.getElementById('requestForm').addEventListener('submit', async function
     }
 });
 
-// ===== SCROLL TO CONTENT =====
 function scrollToContent() {
     document.getElementById('page-home').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-// ===== CLOSE MODAL ON OUTSIDE CLICK =====
 document.getElementById('playerModal').addEventListener('click', function(e) {
     if (e.target === this) closePlayer();
 });
 
-// ===== KEYBOARD ESCAPE =====
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') closePlayer();
 });
