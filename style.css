@@ -136,3 +136,51 @@ body { background: var(--bg); color: var(--text); }
     .hero-content h1 { font-size: 1.5rem; }
     .page { padding: 15px; }
 }
+
+/* ===== PLAYER CONTROLS ===== */
+.player-controls {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    padding: 15px 20px 10px;
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+}
+.ctrl-btn {
+    padding: 10px 25px;
+    border: none;
+    border-radius: 50px;
+    background: var(--card);
+    color: var(--text);
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--border);
+}
+.ctrl-btn:hover {
+    background: var(--accent);
+    color: #fff;
+    transform: scale(1.05);
+}
+.ctrl-btn.close-ctrl:hover {
+    background: var(--accent);
+}
+.player-info {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 20px 15px;
+    color: var(--text2);
+    font-size: 0.85rem;
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+    gap: 10px;
+}
+#prevBtn:disabled, #nextBtn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}

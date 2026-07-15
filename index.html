@@ -45,7 +45,7 @@
     <div id="page-home" class="page active">
         <div class="page-header">
             <h2><i class="fas fa-fire" style="color:#e50914;"></i> Trending Now</h2>
-            <span class="view-all">View All →</span>
+            <span class="view-all">11 Episodes</span>
         </div>
         <div class="video-grid" id="videoGrid">
             <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading episodes...</div>
@@ -55,7 +55,7 @@
     <div id="page-library" class="page">
         <div class="page-header">
             <h2><i class="fas fa-film" style="color:#00d4ff;"></i> Full Library</h2>
-            <span class="view-all">11 Episodes</span>
+            <span class="view-all">All Episodes</span>
         </div>
         <div class="video-grid" id="libraryGrid"></div>
     </div>
@@ -96,6 +96,15 @@
             </div>
             <div class="player-wrapper">
                 <video id="player" controls autoplay></video>
+            </div>
+            <div class="player-controls">
+                <button onclick="playPrev()" class="ctrl-btn" id="prevBtn"><i class="fas fa-step-backward"></i> Prev</button>
+                <button onclick="closePlayer()" class="ctrl-btn close-ctrl"><i class="fas fa-times"></i> Close</button>
+                <button onclick="playNext()" class="ctrl-btn" id="nextBtn">Next <i class="fas fa-step-forward"></i></button>
+            </div>
+            <div class="player-info">
+                <span id="episodeCounter">Episode 1 of 11</span>
+                <span><i class="fas fa-arrow-left"></i> <i class="fas fa-arrow-right"></i> or Arrow Keys</span>
             </div>
         </div>
     </div>

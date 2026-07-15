@@ -18,8 +18,12 @@ if (saved) {
 }
 
 // ===== BOT TOKEN (CHANGE THESE) =====
-const BOT_TOKEN = "8743338027:AAHJRm2Q_VKb4HWON90dKzjclaNA5iXpib0" ;  // 👈 Replace with your bot token
+const BOT_TOKEN = "8743338027:AAHJRm2Q_VKb4HWON90dKzjclaNA5iXpib0";  // 👈 Replace with your bot token
 const CHAT_ID = "8501984482";      // 👈 Replace with your chat ID
+
+// ===== EPISODE LIST (Sorted) =====
+let episodeList = [];
+let currentEpisodeIndex = 0;
 
 // ===== PAGES =====
 function showPage(page) {
@@ -32,13 +36,31 @@ function showPage(page) {
     else if (page === 'request') links[2].classList.add('active');
 }
 
-// ===== PLAYER =====
-function playVideo(filename, title) {
-    document.getElementById('playerTitle').textContent = title || filename;
+// ===== PLAYER FUNCTIONS =====
+function playVideo(filename, title, index) {
+    currentEpisodeIndex = index;
+    document.getElementById('playerTitle').textContent = title;
     const player = document.getElementById('player');
-    player.src = `${API_BASE}/stream/Jujutsu_Kaisen_S3/${encodeURIComponent(filename)}`;
+    const videoUrl = `${API_BASE}/stream/Jujutsu_Kaisen_S3/${encodeURIComponent(filename)}`;
+    console.log('🎬 Playing:', videoUrl);
+    player.src = videoUrl;
+    player.load();
     document.getElementById('playerModal').classList.add('show');
     player.play();
+}
+
+function playNext() {
+    if (currentEpisodeIndex < episodeList.length - 1) {
+        const next = episodeList[currentEpisodeIndex + 1];
+        playVideo(next.filename, next.displayName, currentEpisodeIndex + 1);
+    }
+}
+
+function playPrev() {
+    if (currentEpisodeIndex > 0) {
+        const prev = episodeList[currentEpisodeIndex - 1];
+        playVideo(prev.filename, prev.displayName, currentEpisodeIndex - 1);
+    }
 }
 
 function closePlayer() {
@@ -48,7 +70,7 @@ function closePlayer() {
     document.getElementById('playerModal').classList.remove('show');
 }
 
-// ===== LOAD VIDEOS =====
+// ===== LOAD VIDEOS (Sorted) =====
 async function loadVideos() {
     const grid = document.getElementById('videoGrid');
     const libGrid = document.getElementById('libraryGrid');
@@ -56,23 +78,38 @@ async function loadVideos() {
         const res = await fetch(`${API_BASE}/videos`);
         const data = await res.json();
         if (data.videos && data.videos.length > 0) {
-            const jjkVideos = data.videos.filter(v => v.includes('Jujutsu_Kaisen_S3'));
+            // Filter JJK videos
+            let jjkVideos = data.videos.filter(v => v.includes('Jujutsu_Kaisen_S3'));
+            
             if (jjkVideos.length === 0) {
                 grid.innerHTML = '<div class="loading"><i class="fas fa-folder-open"></i> No JJK episodes found.</div>';
                 libGrid.innerHTML = '<div class="loading"><i class="fas fa-folder-open"></i> No episodes in library.</div>';
                 return;
             }
-            const cards = jjkVideos.map((v, i) => {
+
+            // ✅ Sort by episode number (Jjk1 → Jjk11)
+            jjkVideos.sort((a, b) => {
+                const numA = parseInt(a.match(/Jjk(\d+)/i)?.[1] || 999);
+                const numB = parseInt(b.match(/Jjk(\d+)/i)?.[1] || 999);
+                return numA - numB;
+            });
+
+            // Build episode list
+            episodeList = jjkVideos.map((v, i) => {
                 const filename = v.split('/').pop();
-                const name = filename.replace(/\.(mp4|mkv|avi|mov)$/, '').replace(/_/g, ' ');
-                return `
-                    <div class="video-card" onclick="playVideo('${filename}', '${name}')">
-                        <div class="thumb">🎬</div>
-                        <h4>${name}</h4>
-                        <p>Episode ${i+1} • ${filename.split('.').pop().toUpperCase()}</p>
-                    </div>
-                `;
-            }).join('');
+                const ext = filename.split('.').pop();
+                const displayName = `Episode ${i + 1}`;
+                return { filename, displayName, ext, fullPath: v };
+            });
+
+            const cards = episodeList.map((ep, i) => `
+                <div class="video-card" onclick="playVideo('${ep.filename}', '${ep.displayName}', ${i})">
+                    <div class="thumb">🎬</div>
+                    <h4>${ep.displayName}</h4>
+                    <p>${ep.ext.toUpperCase()} • Watch Now</p>
+                </div>
+            `).join('');
+            
             grid.innerHTML = cards;
             libGrid.innerHTML = cards;
         } else {
@@ -113,12 +150,15 @@ function scrollToContent() {
     document.getElementById('page-home').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
+// ===== CLOSE MODAL =====
 document.getElementById('playerModal').addEventListener('click', function(e) {
     if (e.target === this) closePlayer();
 });
 
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') closePlayer();
+    if (e.key === 'ArrowRight') playNext();
+    if (e.key === 'ArrowLeft') playPrev();
 });
 
 loadVideos();
